@@ -1,8 +1,76 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+/* @import "swiper/css";
+@import "swiper/css/pagination"; */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme{
+  /* Mantemos o seu verde original como identidade */
+  --color-primary: #145a43; 
+  --color-primary-dark: #0f3d2a; 
+  /* Substituímos o rosa por um Azul Ardósia Profissional */
+  --color-secondary: #334155;      /* Slate 700: Para botões e elementos de destaque sóbrios */
+  --color-secondary-dark: #1e293b; /* Slate 800: Para hovers */
+  
+  /* Auxiliares */
+  --color-accent: #3fbf9a;         /* Verde claro para sucessos ou ícones ativos */
+  --color-light: #f8fafc;          /* Cinza quase branco para fundos */
+  --color-mono: #475569;           /* Texto principal */
+  --color-mono-dark: #1e293b;      /* Títulos e textos fortes */
+  --color-blue-breadcrumb: #0369a1;/* Azul oceano para links */
+  --color-border: #e2e8f0;         /* Bordas finas e elegantes */
+  --color-white: #ffffff;
+}
+
+/* --- Background Classes --- */
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-dark { background-color: var(--color-primary-dark); }
+.bg-secondary { background-color: var(--color-secondary); }
+.bg-accent { background-color: var(--color-accent); }
+.bg-light { background-color: var(--color-light); }
+.bg-mono-white { background-color: var(--color-mono-white); }
+
+/* --- Text Color Classes --- */
+.text-primary { color: var(--color-primary); }
+.text-primary-dark { color: var(--color-primary-dark); }
+.text-secondary { color: var(--color-secondary); }
+.text-accent { color: var(--color-accent); }
+.text-mono { color: var(--color-mono); }
+.text-mono-dark { color: var(--color-mono-dark); }
+.text-breadcrumb { color: var(--color-blue-breadcrumb); }
+.text-white { color: #ffffff; }
+
+/* --- Border Classes --- */
+.border-primary { border: 1px solid var(--color-primary); }
+.border-light { border: 1px solid var(--color-light); }
+.border-accent { border: 1px solid var(--color-accent); }
+
+/* --- Button States (Exemplo Prático) --- */
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-dark-secondary);
+}
+
+@theme {
+  --font-greatvibes: "Great Vibes", cursive;
+  --font-poppins: "Poppins", sans-serif;
 }
 
 @theme inline {
@@ -12,15 +80,30 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.swiper-pagination-bullet-active {
+  background-color: var(--color-primary);
+}
+
+.swiper-calendar-index .swiper-pagination {
+  @apply bottom-0;
+}
+
+.break-words-for-text {
+  word-break: break-word;
 }
