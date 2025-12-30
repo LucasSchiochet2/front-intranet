@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Header } from './header';
 import { SidebarClient } from './sidebar-client';
+import { Breadcrumb } from './breadcrumb';
 import { MenuItem } from '../../api';
 
 interface User {
@@ -62,6 +63,7 @@ export function DashboardClientLayout({ children, menuItems, user }: DashboardCl
             ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}
           `}
         >
+          <Breadcrumb />
           {children}
         </main>
       </div>

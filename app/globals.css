@@ -107,3 +107,9 @@ body {
 .break-words-for-text {
   word-break: break-word;
 }
+
+/* Fix for images inside prose content */
+.prose img {
+  margin-left: auto;
+  margin-right: auto;
+}

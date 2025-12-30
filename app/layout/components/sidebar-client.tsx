@@ -5,7 +5,12 @@ import { MenuItem } from '../../api';
 
 const MenuItemComponent = ({ item }: { item: MenuItem }) => {
   const hasChildren = item.children && item.children.length > 0;
-  const href = item.link || '#';
+  let href = item.link || '#';
+
+  // Ensure internal links start with / to avoid relative path issues
+  if (href && href !== '#' && !href.startsWith('http') && !href.startsWith('/')) {
+    href = `/${href}`;
+  }
 
   return (
     <li>

@@ -1,6 +1,7 @@
 const API_URL = process.env.API_URL?.endsWith('/') 
   ? process.env.API_URL 
   : `${process.env.API_URL}/`;
+export const storageUrl = 'http://intranetproject.test/';
 
 export interface MenuItem {
   id: number;
@@ -101,48 +102,70 @@ export async function getMenu(): Promise<MenuItem[]> {
 export interface NewsItem {
   id: number;
   title: string;
-  summary: string;
-  date: string;
-  image_url?: string;
-  category: string;
+  slug: string;
+  content: string;
+  image: string;
+  featured: boolean;
+  published_at: string;
+  created_at: string;
+  updated_at: string;
+  photos: string[];
+  tenant_id: number | null;
 }
 
 export async function getNews(): Promise<NewsItem[]> {
-  // Mock data
-  return [
-    {
-      id: 1,
-      title: "Lançamento do Novo Portal",
-      summary: "Estamos felizes em anunciar o lançamento da nossa nova intranet corporativa.",
-      date: "2023-10-27",
-      category: "Institucional",
-      image_url: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-      id: 2,
-      title: "Resultados do Trimestre",
-      summary: "Confira os resultados alcançados pela equipe no último trimestre.",
-      date: "2023-10-25",
-      category: "Financeiro",
-      image_url: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-      id: 3,
-      title: "Treinamento de Segurança",
-      summary: "Novo módulo de treinamento de segurança da informação disponível.",
-      date: "2023-10-20",
-      category: "RH",
-      image_url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=60"
-    },
-    {
-      id: 4,
-      title: "Evento de Integração",
-        summary: "Participe do nosso próximo evento de integração para novos colaboradores.",
-        date: "2023-10-18",
-        category: "Eventos",
-        image_url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=500&q=60"
+  try {
+    const response = await fetch(`${API_URL}news`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch news');
     }
-  ];
+
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      return data.data;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching news:', error);
+    return [];
+  }
+}
+
+export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
+  try {
+    // Primeiro tenta buscar todas as notícias e filtrar (fallback caso o endpoint de slug não exista)
+    const allNews = await getNews();
+    const newsItem = allNews.find(item => item.slug === slug);
+    
+    if (newsItem) {
+      return newsItem;
+    }
+
+    // Se não encontrar na lista, tenta o endpoint direto (caso a lista seja paginada e o item não esteja nela)
+    const url = `${API_URL}news/${slug}`;
+    const response = await fetch(url, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  } catch (error) {
+    console.error(`Error fetching news with slug ${slug}:`, error);
+    return null;
+  }
 }
 
 export interface CalendarEvent {
