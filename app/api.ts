@@ -1,4 +1,4 @@
-const API_URL = process.env.API_URL?.endsWith('/') 
+export const API_URL = process.env.API_URL?.endsWith('/') 
   ? process.env.API_URL 
   : `${process.env.API_URL}/`;
 export const storageUrl = 'http://intranetproject.test/';
@@ -225,3 +225,29 @@ export async function login(credentials: {email: string, password: string}) {
   return response.json();
 }
 
+
+export interface OmbudsmanData {
+  id: number;
+  status: 'open' | 'in_progress' | 'resolved' | string;
+  created_at: string;
+  message?: string;
+  description?: string;
+  response?: string;
+  admin_notes?: string;
+  subject?: string;
+  type?: string;
+  attachment?: string;
+  admin_attachment?: string;
+  resolved_at?: string;
+}
+
+export async function getOmbudsmanProtocol(token: string): Promise<OmbudsmanData> {
+  const response = await fetch(`${API_URL}ombudsman/${token}`, {
+    next: { revalidate: 60 },
+  });
+  if (!response.ok) {
+    throw new Error("Protocolo não encontrado ou erro na busca.");
+  }
+
+  return response.json();
+}

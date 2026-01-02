@@ -1,6 +1,6 @@
 'use server'
 
-import { login } from './api';
+import { login, API_URL, getOmbudsmanProtocol } from './api';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
@@ -40,3 +40,42 @@ export async function logout() {
   cookieStore.delete('user_session');
   revalidatePath('/');
 }
+
+export type OmbudsmanState = {
+  success: boolean;
+  error?: string;
+  message?: string;
+  token?: string;
+};
+
+export async function submitOmbudsman(prevState: OmbudsmanState, formData: FormData): Promise<OmbudsmanState> {
+  try {
+    const response = await fetch(`${API_URL}ombudsman`, {
+      method: 'POST',
+      headers: {
+        'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      return { success: false, error: data.message || 'Erro ao enviar solicitação' };
+    }
+
+    const data = await response.json();
+    return { 
+      success: true, 
+      message: 'Solicitação enviada com sucesso!',
+      token: data.token 
+    };
+  } catch (error) {
+    console.error('Ombudsman error:', error);
+    return { success: false, error: 'Erro de conexão ao enviar solicitação' };
+  }
+}
+
+export async function fetchOmbudsmanProtocol(token: string) {
+  return await getOmbudsmanProtocol(token);
+}
+

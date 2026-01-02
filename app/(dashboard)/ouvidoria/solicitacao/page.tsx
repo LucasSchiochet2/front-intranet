@@ -1,8 +1,10 @@
-export default function NovaSolicitacaoPage() {
-  return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-4">Nova Solicitação</h1>
-      <p>Formulário de nova solicitação será implementado aqui.</p>
-    </div>
-  );
+import { cookies } from "next/headers";
+import SolicitacaoForm from "./solicitacao-form";
+
+export default async function NovaSolicitacaoPage() {
+  const cookieStore = await cookies();
+  const userCookie = cookieStore.get('user_session');
+  const user = userCookie ? JSON.parse(userCookie.value) : null;
+
+  return <SolicitacaoForm user={user} />;
 }
