@@ -171,40 +171,66 @@ export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
 export interface CalendarEvent {
   id: number;
   title: string;
-  date: string;
-  time: string;
-  location: string;
-  type: 'meeting' | 'event' | 'holiday';
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  collaborator?: {
+    id: number;
+    name: string;
+  };
 }
 
 export async function getCalendarEvents(): Promise<CalendarEvent[]> {
-  // Mock data
-  return [
-    {
-      id: 1,
-      title: "Reunião Geral",
-      date: "2023-11-01",
-      time: "10:00",
-      location: "Sala de Conferências",
-      type: "meeting"
-    },
-    {
-      id: 2,
-      title: "Feriado Nacional",
-      date: "2023-11-02",
-      time: "Dia todo",
-      location: "-",
-      type: "holiday"
-    },
-    {
-      id: 3,
-      title: "Workshop de Inovação",
-      date: "2023-11-05",
-      time: "14:00",
-      location: "Auditório",
-      type: "event"
+  try {
+    const response = await fetch(`${API_URL}calendar`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch calendar events');
     }
-  ];
+
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      return data.data;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching calendar events:', error);
+    return [];
+  }
+}
+export async function getUpcomingEvents(): Promise<CalendarEvent[]> {
+  try {
+    const response = await fetch(`${API_URL}calendar/upcoming`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch calendar events');
+    }
+
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      return data.data;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching calendar events:', error);
+    return [];
+  }
 }
 
 export async function login(credentials: {email: string, password: string}) {
