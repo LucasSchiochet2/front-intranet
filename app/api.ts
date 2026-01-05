@@ -277,3 +277,123 @@ export async function getBirthDays() {
     return [];
   }
 }
+
+export interface DocumentCategory {
+  id: number;
+  name: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
+  tenant_id: string | null;
+}
+
+export interface DocumentFile {
+  id: number;
+  url: string;
+  name: string;
+}
+
+export interface Document {
+  id: number;
+  document_category_id: number;
+  title: string;
+  description: string;
+  files: string[];
+  created_at: string;
+  updated_at: string;
+  tenant_id: string | null;
+  category: DocumentCategory;
+}
+
+export interface DocumentsResponse {
+  current_page: number;
+  data: Document[];
+  last_page?: number;
+  total?: number;
+}
+
+export async function getDocuments(page = 1, categoryId?: number): Promise<DocumentsResponse> {
+  try {
+    let url = `${API_URL}documents?page=${page}`;
+    if (categoryId) {
+      url = `${API_URL}documents/category/${categoryId}?page=${page}`;
+    }
+    
+    const response = await fetch(url, {
+      next: { revalidate: 60 },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch documents');
+    }
+    
+    const data = await response.json();
+    
+    // Handle if response is just an array (common in some endpoints)
+    if (Array.isArray(data)) {
+      return { current_page: 1, data: data, last_page: 1, total: data.length };
+    }
+    
+    // Handle if response has data property but it might be nested differently or missing
+    if (!data.data && Array.isArray(data.documents)) {
+       return { ...data, data: data.documents };
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching documents:', error);
+    return { current_page: 1, data: [] };
+  }
+}
+
+export async function getDocumentCategories(): Promise<DocumentCategory[]> {
+  try {
+    const response = await fetch(`${API_URL}documents/categories`, {
+      next: { revalidate: 3600 },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch categories');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
+
+export async function searchDocuments(query: string): Promise<DocumentsResponse> {
+  try {
+    const response = await fetch(`${API_URL}documents/search?query=${query}`, {
+      next: { revalidate: 60 },
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to search documents');
+    }
+    
+    const data = await response.json();
+    // Handle if response is just an array or paginated
+    if (Array.isArray(data)) {
+      return { current_page: 1, data: data, total: data.length, last_page: 1 };
+    }
+    return data;
+  } catch (error) {
+    console.error('Error searching documents:', error);
+    return { current_page: 1, data: [] };
+  }
+}
+
+export async function getShowDocuments(id: number): Promise<Document | null> {
+  try {
+    const response = await fetch(`${API_URL}documents/${id}`, {
+      next: { revalidate: 60 },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch document');
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching document:', error);
+    return null;
+  }
+}
