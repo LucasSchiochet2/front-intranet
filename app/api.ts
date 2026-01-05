@@ -24,16 +24,17 @@ export interface MenuItem {
 export interface Banner {
   id: number;
   title: string;
-  image_url: string;
-  link: string | null;
   description: string | null;
+  image_url: string | null;
+  link_url: string | null;
+  is_active: number;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export async function getBanners(): Promise<Banner[]> {
   try {
-    // Mock data for now as I don't have the real endpoint response structure
-    // In a real scenario, uncomment the fetch below
-    /*
     const response = await fetch(`${API_URL}banners`, {
       next: { revalidate: 60 },
     });
@@ -43,32 +44,7 @@ export async function getBanners(): Promise<Banner[]> {
     }
 
     const data = await response.json();
-    return data;
-    */
-   
-    return [
-      {
-        id: 1,
-        title: "Bem-vindo à Intranet",
-        image_url: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
-        link: "#",
-        description: "Fique por dentro de todas as novidades da empresa."
-      },
-      {
-        id: 2,
-        title: "Novos Benefícios",
-        image_url: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1200&q=80",
-        link: "/beneficios",
-        description: "Confira a nova lista de benefícios para colaboradores."
-      },
-      {
-        id: 3,
-        title: "Evento de Final de Ano",
-        image_url: "https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80",
-        link: "/eventos",
-        description: "Não perca nossa festa de confraternização!"
-      }
-    ];
+    return Array.isArray(data) ? data : (data.data || []);
   } catch (error) {
     console.error('Error fetching banners:', error);
     return [];
