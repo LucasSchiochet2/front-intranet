@@ -10,6 +10,8 @@ interface User {
   email: string;
   position?: string | null;
   department?: string | null;
+  birth_date?: string | null;
+  url_photo?: string | null;
 }
 
 interface HeaderProps {
@@ -108,12 +110,26 @@ export function Header({ onToggleSidebar, user }: HeaderProps) {
                 <p className="text-xs text-gray-500">{user?.position || user?.email || ''}</p>
             </div>
             <div className="relative">
+              {user?.url_photo && (
+                <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+              >
+                <img
+                  src={process.env.NEXT_PUBLIC_BASE_URL + user.url_photo}
+                  alt={user.name || 'User Photo'}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+                </button>
+              )}
+              {!user?.url_photo && (
               <button 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+                className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
               >
                   <span className="font-semibold">{user?.name ? getInitials(user.name) : 'V'}</span>
-              </button>
+              </button> 
+            )}
 
               {isProfileOpen && (
                 <>

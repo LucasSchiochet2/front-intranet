@@ -102,7 +102,7 @@ export default function AcompanhamentoPage() {
                 </p>
                 <p>
                   {data.created_at
-                    ? new Date(data.created_at).toLocaleDateString()
+                    ? new Date(data.created_at).toLocaleDateString('pt-BR')
                     : "N/A"}
                 </p>
               </div>
@@ -111,7 +111,7 @@ export default function AcompanhamentoPage() {
                   <p className="font-semibold text-sm text-slate-500">
                     Resolvido em
                   </p>
-                  <p>{new Date(data.resolved_at).toLocaleDateString()}</p>
+                  <p>{new Date(data.resolved_at).toLocaleDateString('pt-BR')}</p>
                 </div>
               )}
               <div className="col-span-full">

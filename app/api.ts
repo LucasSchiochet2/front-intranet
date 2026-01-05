@@ -277,3 +277,27 @@ export async function getOmbudsmanProtocol(token: string): Promise<OmbudsmanData
 
   return response.json();
 }
+export interface BirthDay {
+  name: string;
+  birth_date: string;
+  url_photo?: string | null;
+}
+export async function getBirthDays() {
+  try {
+    const response = await fetch(`${API_URL}birthdays`, {
+      next: { revalidate: 60 },
+    });
+    console.log('Fetching birthdays from:', `${API_URL}birthdays`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch birthdays');
+    }
+    const data = await response.json();
+    console.log(data);
+    return data;
+  }
+  catch (error) {
+    console.error('Error fetching birthdays:', error);
+    return [];
+  }
+}
