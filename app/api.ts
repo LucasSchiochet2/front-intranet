@@ -397,3 +397,289 @@ export async function getShowDocuments(id: number): Promise<Document | null> {
     return null;
   }
 }
+
+export interface Collaborator {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface ChecklistItem {
+  id?: number;
+  description: string;
+  is_completed: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  is_completed: boolean;
+  deadline?: string;
+  collaborator_id_sender: number;
+  collaborator_id_receiver: number;
+  status: string; // 'pending' | 'in_progress' | 'done'
+  tag?: string;
+  attachment?: string[] | string | null;
+  checklist_items?: ChecklistItem[];
+  created_at: string;
+  updated_at: string;
+  sender?: Collaborator;
+  receiver?: Collaborator;
+  is_archived?: boolean | number;
+  // Old fields for backward compatibility/during transition
+  message?: string;
+  subject?: string;
+  type?: string;
+}
+
+export async function getCollaborators(): Promise<Collaborator[]> {
+  try {
+    const response = await fetch(`${API_URL}collaborators`, {
+      next: { revalidate: 3600 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+       return [];
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data)) return data;
+    if (data.collaborators && Array.isArray(data.collaborators)) return data.collaborators;
+    if (data.data && Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (error) {
+    console.error('Error fetching collaborators:', error);
+    return [];
+  }
+}
+
+
+
+export async function getCollaboratorTasks(collaboratorId: number): Promise<Task[]> {
+  try {
+    const response = await fetch(`${API_URL}task/collaborator/${collaboratorId}`, {
+      next: { revalidate: 0 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+        if (response.status === 404) return [];
+        throw new Error('Failed to fetch collaborator tasks');
+    }
+
+    const data = await response.json();
+    
+    let tasks: Task[] = [];
+    if (Array.isArray(data)) {
+      tasks = data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      tasks = data.data;
+    }
+
+    return tasks.map((t) => ({
+      ...t,
+      status: t.status || 'todo'
+    }));
+
+  } catch (error) {
+    console.error('Error fetching collaborator tasks:', error);
+    return [];
+  }
+}
+
+// export async function getCollaboratorSenderTasks(collaboratorId: number): Promise<Task[]> {
+//   try {
+//     const response = await fetch(`${API_URL}task/collaborator/sender/${collaboratorId}`, {
+//       next: { revalidate: 0 },
+//       headers: {
+//         'Accept': 'application/json',
+//       },
+//     });
+
+//     if (!response.ok) {
+//         if (response.status === 404) return [];
+//         throw new Error('Failed to fetch sender tasks');
+//     }
+
+//     const data = await response.json();
+    
+//     let tasks: Task[] = [];
+//     if (Array.isArray(data)) {
+//       tasks = data;
+//     } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+//       tasks = data.data;
+//     }
+
+//     return tasks.map((t: any) => ({
+//       ...t,
+//       status: t.status || 'todo'
+//     }));
+
+//   } catch (error) {
+//     console.error('Error fetching sender tasks:', error);
+//     return [];
+//   }
+// }
+
+export async function getTasks(): Promise<Task[]> {
+  try {
+    const response = await fetch(`${API_URL}task`, {
+      next: { revalidate: 0 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+        if (response.status === 404) return [];
+        throw new Error('Failed to fetch tasks');
+    }
+
+    const data = await response.json();
+    
+    let tasks: Task[] = [];
+    if (Array.isArray(data)) {
+      tasks = data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      tasks = data.data;
+    }
+
+    return tasks.map((t) => ({
+      ...t,
+      status: t.status || 'todo'
+    }));
+
+  } catch (error) {
+    console.error('Error fetching tasks:', error);
+    return [];
+  }
+}
+
+export async function createTask(formData: FormData) {
+  const response = await fetch(`${API_URL}task`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    console.error('Create task failed:', response.status, data);
+    throw new Error(data.message || 'Failed to create task');
+  }
+
+  return response.json();
+}
+
+export async function updateTask(id: number, data: Partial<Task> | FormData) {
+  let body: BodyInit;
+  let method = 'PUT';
+  const headers: HeadersInit = {
+    'Accept': 'application/json',
+    'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+  };
+
+  if (data instanceof FormData) {
+    // For file uploads in Laravel/PHP via PUT, we often need to simulate PUT via POST
+    // and append _method field.
+    data.append('_method', 'PUT');
+    body = data;
+    method = 'POST'; 
+  } else {
+    body = JSON.stringify(data);
+    headers['Content-Type'] = 'application/json';
+  }
+  
+  const response = await fetch(`${API_URL}task/${id}`, {
+    method,
+    headers,
+    body,
+  });
+
+  if (!response.ok) {
+    const resData = await response.json().catch(() => ({}));
+    console.error('Update task failed:', response.status, resData);
+    throw new Error(resData.message || 'Failed to update task');
+  }
+
+  return response.json();
+}
+
+export async function archiveTask(id: number) {
+  const response = await fetch(`${API_URL}task/${id}`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to archive task');
+  }
+
+  return response.json();
+}
+
+export async function unarchiveTask(id: number) {
+  const response = await fetch(`${API_URL}task/${id}/unarchive`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to unarchive task');
+  }
+
+  return response.json();
+}
+
+export async function getArchivedTasks(): Promise<Task[]> {
+  try {
+    const response = await fetch(`${API_URL}task/archived`, {
+      next: { revalidate: 0 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+        if (response.status === 404) return [];
+        throw new Error('Failed to fetch archived tasks');
+    }
+
+    const data = await response.json();
+    
+    let tasks: Task[] = [];
+    if (Array.isArray(data)) {
+      tasks = data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      tasks = data.data;
+    }
+
+    return tasks.map((t) => ({
+      ...t,
+      status: t.status || 'todo'
+    }));
+
+  } catch (error) {
+    console.error('Error fetching archived tasks:', error);
+    return [];
+  }
+}
