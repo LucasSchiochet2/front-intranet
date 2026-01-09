@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Front Intranet
 
-## Getting Started
+Corporate Intranet System developed with the latest technologies from the React ecosystem. The project offers a modern and responsive interface for internal communication and task management.
 
-First, run the development server:
+## 🚀 Technologies Used
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **UI Library**: [React 19](https://react.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Carousel**: [Swiper](https://swiperjs.com/)
+
+## ✨ Features
+
+The system includes several integrated modules:
+
+- **🔐 Authentication**: Secure login system.
+- **📅 Calendar**: Visualization of corporate events.
+- **📋 Tasks (Kanban)**: Kanban-style task management (To Do, In Progress, Done) with details, editing, and archiving.
+- **📰 News**: Corporate news feed with image support.
+- **📂 Documents**: Document repository with filters.
+- **🗣️ Ombudsman**: Channel for sending and tracking requests and feedback.
+- **🎂 Birthdays**: Widget to view the birthdays of the month.
+- **🔗 Quick Access & Useful Links**: Shortcuts to external tools and sites.
+- **🖼️ Image Gallery**: Component for viewing photos.
+
+## 📂 Project Structure
+
+The folder structure follows the **Next.js App Router** pattern:
+
+```
+app/
+├── (auth)/            # Authentication routes (Login)
+├── (dashboard)/       # Protected main dashboard routes
+│   ├── calendario/    # Calendar Module
+│   ├── documentos/    # Documents Module
+│   ├── noticias/      # News Module
+│   ├── ouvidoria/     # Ombudsman Module
+│   └── tarefas/       # Tasks Module
+├── components/        # Reusable components (UI)
+│   ├── tasks/         # Components specific to the tasks module
+│   └── ...
+├── layout/            # Layout components (Sidebar, Header)
+└── views/             # Specific views (e.g., login screen)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Installation and Execution
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Prerequisites: Node.js (version compatible with Next.js 16).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/your-username/front-intranet.git
+   cd front-intranet
+   ```
 
-## Learn More
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Access the project:**
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📦 Available Scripts
 
-## Deploy on Vercel
+- `npm run dev`: Starts the development environment.
+- `npm run build`: Creates the optimized production build.
+- `npm run start`: Starts the production server locally.
+- `npm run lint`: Runs code verification with ESLint.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Developed with Next.js and ❤️.
