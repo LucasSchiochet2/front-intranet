@@ -402,6 +402,7 @@ export interface Collaborator {
   id: number;
   name: string;
   email: string;
+  tenant_id?: number | string;
 }
 
 export interface ChecklistItem {
@@ -412,10 +413,21 @@ export interface ChecklistItem {
   updated_at?: string;
 }
 
+export interface Dashboard {
+  id: number;
+  name: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+  collaborators?: Collaborator[];
+  tasks?: Task[];
+}
+
 export interface Task {
   id: number;
   title: string;
   description: string;
+  dashboard_id?: number | null;
   is_completed: boolean;
   deadline?: string;
   collaborator_id_sender: number;
@@ -438,9 +450,10 @@ export interface Task {
 export async function getCollaborators(): Promise<Collaborator[]> {
   try {
     const response = await fetch(`${API_URL}collaborators`, {
-      next: { revalidate: 3600 },
+      next: { revalidate: 60 },
       headers: {
         'Accept': 'application/json',
+        'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
       },
     });
 
@@ -452,11 +465,187 @@ export async function getCollaborators(): Promise<Collaborator[]> {
     if (Array.isArray(data)) return data;
     if (data.collaborators && Array.isArray(data.collaborators)) return data.collaborators;
     if (data.data && Array.isArray(data.data)) return data.data;
+    
     return [];
   } catch (error) {
     console.error('Error fetching collaborators:', error);
     return [];
   }
+}
+
+export async function getDashboards(): Promise<Dashboard[]> {
+  try {
+    const response = await fetch(`${API_URL}dashboard`, {
+      next: { revalidate: 60 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+       return [];
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data)) return data;
+    if (data.data && Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (error) {
+    console.error('Error fetching dashboards:', error);
+    return [];
+  }
+}
+
+export async function getDashboard(id: number): Promise<Dashboard | null> {
+  try {
+    const response = await fetch(`${API_URL}dashboard/${id}`, {
+      next: { revalidate: 60 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+       return null;
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  } catch (error) {
+    console.error(`Error fetching dashboard ${id}:`, error);
+    return null;
+  }
+}
+
+export async function getCollaboratorDashboards(collaboratorId: number): Promise<Dashboard[]> {
+  try {
+    const response = await fetch(`${API_URL}dashboard/collaborator/${collaboratorId}`, {
+      next: { revalidate: 60 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+       return [];
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data)) return data;
+    if (data.data && Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (error) {
+    console.error(`Error fetching dashboards for collaborator ${collaboratorId}:`, error);
+    return [];
+  }
+}
+
+export async function getPersonalDashboards(collaboratorId: number): Promise<Dashboard[]> {
+  try {
+    const response = await fetch(`${API_URL}dashboard/personal/${collaboratorId}`, {
+      next: { revalidate: 60 },
+      headers: {
+        'Accept': 'application/json',
+        'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+      },
+    });
+
+    if (!response.ok) {
+       return [];
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data)) return data;
+    if (data.data && Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (error) {
+    console.error(`Error fetching personal dashboards for ${collaboratorId}:`, error);
+    return [];
+  }
+}
+
+export async function createDashboard(data: { name: string; description: string; collaborators: number[]; tenant_id?: number | string }) {
+  const response = await fetch(`${API_URL}dashboard`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    let errorData = {};
+    try {
+        errorData = JSON.parse(text);
+    } catch (error) {
+        console.error(error, 'Failed to parse error response JSON:', text);
+    }
+    console.error('Create dashboard failed:', response.status, errorData, text);
+  }
+
+  return response.json();
+}
+
+export async function updateDashboard(id: number, data: { name: string; description: string; collaborators: number[]; tenant_id?: number | string } | FormData) {
+  let body: BodyInit;
+  let method = 'PUT';
+  const headers: HeadersInit = {
+    'Accept': 'application/json',
+    'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+  };
+
+  if (data instanceof FormData) {
+    data.append('_method', 'PUT');
+    body = data;
+    method = 'POST';
+  } else {
+    body = JSON.stringify(data);
+    headers['Content-Type'] = 'application/json';
+  }
+
+  const response = await fetch(`${API_URL}dashboard/${id}`, {
+    method,
+    headers,
+    body,
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    let errorData = {};
+    try {
+        errorData = JSON.parse(text);
+    } catch (e) {
+        console.error(e,'Failed to parse error response JSON:', text);
+    }
+    console.error('Update dashboard failed:', response.status, errorData, text);
+  }
+
+  return response.json();
+}
+
+export async function deleteDashboard(id: number) {
+  const response = await fetch(`${API_URL}dashboard/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Accept': 'application/json',
+      'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+    },
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    try {
+        JSON.parse(text);
+    } catch (e) {
+        console.error(e,'Failed to parse error response JSON:', text);
+    }
+    console.error('Delete dashboard failed:', response.status, text);
+  }
+
+  return response.json();
 }
 
 
@@ -560,6 +749,27 @@ export async function getTasks(): Promise<Task[]> {
   } catch (error) {
     console.error('Error fetching tasks:', error);
     return [];
+  }
+}
+
+export async function getTask(id: number): Promise<Task | null> {
+  try {
+    const response = await fetch(`${API_URL}task/${id}`, {
+      next: { revalidate: 0 },
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+       return null;
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  } catch (error) {
+    console.error(`Error fetching task ${id}:`, error);
+    return null;
   }
 }
 

@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import { submitTask } from '../../actions'; // Ensure this path is correct
 import { Loader2, Plus, X, Upload } from 'lucide-react';
-import { Collaborator } from '../../api';
+import { Collaborator, Dashboard } from '../../api';
 
 interface NewTaskDialogProps {
   userEmail?: string;
   collaborators?: Collaborator[];
+  dashboards?: Dashboard[];
 }
 
-export function NewTaskDialog({ userEmail, collaborators = [] }: NewTaskDialogProps) {
+export function NewTaskDialog({ userEmail, collaborators = [], dashboards = [] }: NewTaskDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -61,6 +62,23 @@ export function NewTaskDialog({ userEmail, collaborators = [] }: NewTaskDialogPr
         </div>
         
         <form action={handleSubmit} className="p-4 space-y-4">
+          {dashboards.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Dashboard</label>
+              <select 
+                name="dashboard_id" 
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
+              >
+                <option value="">Minhas Tarefas (Sem Dashboard)</option>
+                {dashboards.map(dashboard => (
+                  <option key={dashboard.id} value={dashboard.id}>
+                    {dashboard.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
             <input 

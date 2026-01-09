@@ -22,7 +22,7 @@ export function TaskArchiveToggle({ isArchived }: TaskArchiveToggleProps) {
     <button
       onClick={toggleView}
       className={`
-        flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm
+        flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm max-sm:h-16.5
         ${isArchived 
           ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
           : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'

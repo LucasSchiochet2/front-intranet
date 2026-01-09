@@ -3,15 +3,16 @@
 import { useState } from 'react';
 import { editTaskAction, editTaskJsonAction } from '../../actions';
 import { Loader2, Save, X, Paperclip, CheckSquare, Plus, Trash2 } from 'lucide-react';
-import { Task, Collaborator, ChecklistItem } from '../../api';
+import { Task, Collaborator, ChecklistItem, Dashboard } from '../../api';
 
 interface EditTaskDialogProps {
   task: Task | null;
   onClose: () => void;
   collaborators?: Collaborator[];
+  dashboards?: Dashboard[];
 }
 
-export function EditTaskDialog({ task, onClose, collaborators = [] }: EditTaskDialogProps) {
+export function EditTaskDialog({ task, onClose, collaborators = [], dashboards = [] }: EditTaskDialogProps) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [checklist, setChecklist] = useState<ChecklistItem[]>(task?.checklist_items || []);
@@ -156,6 +157,25 @@ export function EditTaskDialog({ task, onClose, collaborators = [] }: EditTaskDi
         
         <form action={handleSubmit} className="p-4 space-y-4">
           <input type="hidden" name="id" value={task.id} />
+          
+          {dashboards.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Dashboard</label>
+              <select 
+                name="dashboard_id" 
+                required
+                defaultValue={task.dashboard_id || ''}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none"
+              >
+                <option value="">Selecione um dashboard...</option>
+                {dashboards.map(dashboard => (
+                  <option key={dashboard.id} value={dashboard.id}>
+                    {dashboard.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>

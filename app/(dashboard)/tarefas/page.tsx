@@ -1,7 +1,8 @@
 import { Suspense } from 'react';
-import { getCollaboratorTasks, getCollaborators, getArchivedTasks, Task } from '../../api';
+import { getCollaboratorTasks, getCollaborators, getArchivedTasks, getCollaboratorDashboards, getPersonalDashboards, getDashboard, Task } from '../../api';
 import { KanbanBoard } from '../../components/tasks/kanban-board';
 import { NewTaskDialog } from '../../components/tasks/new-task-dialog';
+import { NewDashboardDialog } from '../../components/tasks/new-dashboard-dialog';
 import { TaskArchiveToggle } from '@/app/components/tasks/task-archive-toggle';
 import { Loader2 } from 'lucide-react';
 import { cookies } from 'next/headers';
@@ -16,20 +17,33 @@ export default async function TarefasPage(props: { searchParams: SearchParams })
   const userCookie = cookieStore.get('user_session');
   const user = userCookie ? JSON.parse(userCookie.value) : null;
 
+  const collaborators = await getCollaborators();
+  const dashboards = (user && user.id) ? await getCollaboratorDashboards(user.id) : [];
+
   let tasks: Task[] = [];
   
   if (showArchived) {
     tasks = await getArchivedTasks();
   } else if (user && user.id) {
-    const [assignedTasks] = await Promise.all([
-      getCollaboratorTasks(user.id),
-    ]);
-    
-    const allTasks = [...assignedTasks];
-    tasks = Array.from(new Map(allTasks.map(item => [item.id, item])).values());
-  }
+    // Busca todas as tarefas atribuídas ao usuário (inclusive sem dashboard)
+    const assignedTasks = await getCollaboratorTasks(user.id);
 
-  const collaborators = await getCollaborators(); 
+    // Busca tarefas pessoais (origem: endpoint personal)
+    const personalDashboards = await getPersonalDashboards(user.id);
+    const personalTasks = personalDashboards.flatMap(d => d.tasks || []);
+    
+    // Busca tarefas dos dashboards compartilhados para preencher as abas quando selecionadas
+    const dashboardDetailsPromises = dashboards.map(d => getDashboard(d.id));
+    const dashboardsWithDetails = await Promise.all(dashboardDetailsPromises);
+    const dashboardTasks = dashboardsWithDetails.flatMap(d => (d && d.tasks) ? d.tasks : []);
+
+    // Merge everything
+    const allTasks = [...assignedTasks, ...personalTasks, ...dashboardTasks];
+    tasks = Array.from(new Map(allTasks.map(item => [item.id, item])).values());
+    
+    // Ensure default status
+    tasks = tasks.map(t => ({...t, status: t.status || 'todo'}));
+  }
 
   return (
     <div className="h-full flex flex-col p-6 space-y-6">
@@ -44,7 +58,12 @@ export default async function TarefasPage(props: { searchParams: SearchParams })
         </div>
         <div className="flex items-center gap-3">
            <TaskArchiveToggle isArchived={showArchived} />
-           {!showArchived && <NewTaskDialog userEmail={user?.email} collaborators={collaborators} />}
+           {!showArchived && (
+            <>
+              <NewDashboardDialog collaborators={collaborators} />
+              <NewTaskDialog userEmail={user?.email} collaborators={collaborators} dashboards={dashboards} />
+            </>
+           )}
         </div>
       </div>
 
@@ -54,7 +73,13 @@ export default async function TarefasPage(props: { searchParams: SearchParams })
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         }>
-          <KanbanBoard initialTasks={tasks} isArchivedView={showArchived} collaborators={collaborators} />
+          <KanbanBoard 
+            initialTasks={tasks} 
+            isArchivedView={showArchived} 
+            collaborators={collaborators} 
+            dashboards={dashboards} 
+            currentUserId={user?.id}
+          />
         </Suspense>
       </div>
     </div>

@@ -1,7 +1,9 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Task, Collaborator, storageUrl } from '../../api';
-import { Calendar, Clock, Edit2, FileText, X, User, Tag, Paperclip, Download, CheckSquare, CheckCircle2, Circle } from 'lucide-react';
+import { getTaskDetailsAction } from '../../actions';
+import { Calendar, Clock, Edit2, FileText, X, User, Tag, Paperclip, Download, CheckSquare, CheckCircle2, Circle, Loader2 } from 'lucide-react';
 
 interface TaskDetailsDialogProps {
   task: Task | null;
@@ -10,8 +12,28 @@ interface TaskDetailsDialogProps {
   collaborators?: Collaborator[];
 }
 
-export function TaskDetailsDialog({ task, onClose, onEdit, collaborators = [] }: TaskDetailsDialogProps) {
-  if (!task) return null;
+export function TaskDetailsDialog({ task: initialTask, onClose, onEdit, collaborators = [] }: TaskDetailsDialogProps) {
+  if (!initialTask) return null;
+
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [task, setTask] = useState<Task>(initialTask);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [isLoading, setIsLoading] = useState(true);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    let mounted = true;
+    async function fetchDetails() {
+        if (!initialTask?.id) return;
+        setIsLoading(true);
+        const res = await getTaskDetailsAction(initialTask.id);
+        if (mounted && res.success && res.data) {
+            setTask(res.data);
+        }
+        if (mounted) setIsLoading(false);
+    }
+    fetchDetails();
+    return () => { mounted = false; };
+  }, [initialTask?.id]);
 
   const title = task.title || task.subject || 'Sem título';
   const description = task.description || task.message || '';
@@ -36,6 +58,7 @@ export function TaskDetailsDialog({ task, onClose, onEdit, collaborators = [] }:
           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
             <FileText className="w-5 h-5 text-primary" />
             Detalhes da Tarefa
+            {isLoading && <Loader2 className="w-4 h-4 animate-spin text-gray-400" />}
           </h2>
           <button onClick={onClose} className="text-gray-500 hover:bg-gray-100 p-2 rounded-full transition-colors">
             <X className="w-5 h-5" />

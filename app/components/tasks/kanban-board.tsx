@@ -1,17 +1,20 @@
 'use client'
 
 import { useState, useOptimistic, startTransition } from 'react';
-import { Task, Collaborator } from '../../api';
+import { Task, Collaborator, Dashboard } from '../../api';
 import { TaskCard } from './task-card';
 import { EditTaskDialog } from './edit-task-dialog';
 import { TaskDetailsDialog } from './task-details-dialog';
+import { EditDashboardDialog } from './edit-dashboard-dialog';
 import { updateTaskStatus } from '../../actions';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Settings } from 'lucide-react';
 
 interface KanbanBoardProps {
   initialTasks: Task[];
   isArchivedView?: boolean;
   collaborators?: Collaborator[];
+  dashboards?: Dashboard[];
+  currentUserId?: number;
 }
 
 const COLUMNS = [
@@ -20,9 +23,11 @@ const COLUMNS = [
   { id: 'done', title: 'Concluído', color: 'bg-green-50 border-green-200' }
 ];
 
-export function KanbanBoard({ initialTasks, isArchivedView = false, collaborators = [] }: KanbanBoardProps) {
+export function KanbanBoard({ initialTasks, isArchivedView = false, collaborators = [], dashboards = [], currentUserId }: KanbanBoardProps) {
   const [viewingTask, setViewingTask] = useState<Task | null>(null);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingDashboard, setEditingDashboard] = useState<Dashboard | null>(null);
+  const [selectedDashboard, setSelectedDashboard] = useState<string>('all');
 
   // Use optimistic updates for instant feedback
   const [optimisticTasks, addOptimisticTask] = useOptimistic(
@@ -78,11 +83,28 @@ export function KanbanBoard({ initialTasks, isArchivedView = false, collaborator
 
   const getTasksForColumn = (columnId: string) => {
     return optimisticTasks.filter(t => {
-      // Map 'todo', 'pending' or 'open' (default) to 'open' column
+      // Filter by dashboard
+      if (selectedDashboard !== 'all') {
+         if (t.dashboard_id !== Number(selectedDashboard)) {
+            return false;
+         }
+      } else {
+        // In "All Tasks", only show tasks where user is involved (sender or receiver), if currentUserId is provided
+        // Use Number() to ensure type safety between string/number IDs
+        const uId = Number(currentUserId);
+        if (uId) {
+            const receiverId = Number(t.collaborator_id_receiver);
+            
+            // Only show tasks assigned to the current user (receiver)
+            if (receiverId !== uId) {
+                return false;
+            }
+        }
+      }
+
       if (columnId === 'open') {
          return !t.status || t.status === 'open' || t.status === 'todo' || t.status === 'pending';
       }
-      // Map 'completed' or 'done'
       if (columnId === 'done') {
           return t.status === 'done' || t.status === 'completed';
       }
@@ -91,7 +113,49 @@ export function KanbanBoard({ initialTasks, isArchivedView = false, collaborator
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 h-full overflow-x-auto pb-4">
+    <div className="flex flex-col h-full gap-4">
+      {dashboards.length > 0 && (
+        <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
+           <button
+                onClick={() => setSelectedDashboard('all')}
+                className={`px-6 py-3 text-base font-medium rounded-t-lg transition-colors whitespace-nowrap ${
+                    selectedDashboard === 'all'
+                        ? 'bg-white border-b-2 border-primary text-primary'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+            >
+                Minhas Tarefas
+            </button>
+            {dashboards.map(d => (
+                <div key={d.id} className="relative group">
+                    <button
+                        onClick={() => setSelectedDashboard(d.id.toString())}
+                        className={`px-6 py-3 text-base font-medium rounded-t-lg transition-colors whitespace-nowrap pr-10 ${
+                            selectedDashboard === d.id.toString()
+                                ? 'bg-white border-b-2 border-primary text-primary'
+                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                        }`}
+                    >
+                        {d.name}
+                    </button>
+                    {selectedDashboard === d.id.toString() && (
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingDashboard(d);
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary hover:bg-gray-100 rounded-full transition-colors"
+                            title="Configurações do Dashboard"
+                        >
+                            <Settings className="w-4 h-4" />
+                        </button>
+                    )}
+                </div>
+            ))}
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row gap-6 h-full overflow-x-auto pb-4">
       {COLUMNS.map((col) => {
         const tasks = getTasksForColumn(col.id);
         
@@ -153,8 +217,19 @@ export function KanbanBoard({ initialTasks, isArchivedView = false, collaborator
           task={editingTask} 
           onClose={() => setEditingTask(null)} 
           collaborators={collaborators}
+          dashboards={dashboards}
         />
       )}
+
+      {editingDashboard && (
+        <EditDashboardDialog 
+          dashboard={editingDashboard}
+          collaborators={collaborators}
+          isOpen={true}
+          onClose={() => setEditingDashboard(null)}
+        />
+      )}
+    </div>
     </div>
   );
 }
