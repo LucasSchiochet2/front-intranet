@@ -893,3 +893,57 @@ export async function getArchivedTasks(): Promise<Task[]> {
     return [];
   }
 }
+
+export async function getMenuLinks(): Promise<MenuItem[]> {
+  try {
+    const response = await fetch(`${API_URL}menu/links`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch menu links');
+    }
+
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      return data.data;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching menu links:', error);
+    return [];
+  }
+}
+
+export async function getFastAccess(): Promise<MenuItem[]> {
+  try {
+    const response = await fetch(`${API_URL}menu/fastaccess`, {
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch fast access');
+    }
+
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      return data.data;
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error fetching fast access:', error);
+    return [];
+  }
+}
