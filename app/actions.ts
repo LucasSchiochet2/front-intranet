@@ -1,6 +1,6 @@
 'use server'
 
-import { login, API_URL, getOmbudsmanProtocol, createTask, updateTask, Task, archiveTask, createDashboard, updateDashboard, deleteDashboard, getCollaborators, getMenu, getCollaboratorDashboards, getDashboard, getTask } from './api';
+import { login, API_URL, getOmbudsmanProtocol, createTask, updateTask, Task, archiveTask, createDashboard, updateDashboard, deleteDashboard, getCollaborators, getMenu, getCollaboratorDashboards, getDashboard, getTask, getCollaboratorMessages, markMessageAsRead } from './api';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
 
@@ -372,6 +372,26 @@ export async function unarchiveTaskAction(id: number) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return { success: false, error: message };
+  }
+}
+
+export async function getCollaboratorMessagesAction(collaboratorId: number) {
+  try {
+    const messages = await getCollaboratorMessages(collaboratorId);
+    return { success: true, data: messages };
+  } catch (error) {
+    console.error('getCollaboratorMessagesAction error:', error);
+    return { success: false, error: 'Falha ao buscar mensagens' };
+  }
+}
+
+export async function markMessageAsReadAction(id: number) {
+  try {
+    await markMessageAsRead(id);
+    return { success: true };
+  } catch (error) {
+    console.error('markMessageAsReadAction error:', error);
+    return { success: false, error: 'Falha ao marcar mensagem como lida' };
   }
 }
 

@@ -964,3 +964,89 @@ export async function getFastAccess(): Promise<MenuItem[]> {
     return [];
   }
 }
+
+export interface Message {
+  id: number;
+  title: string;
+  content: string;
+  sender: string;
+  is_read: number;
+  attachment?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export async function getCollaboratorMessages(collaboratorId: number): Promise<Message[]> {
+  try {
+    const response = await fetch(`${API_URL}message/collaborator/${collaboratorId}`, {
+      next: { revalidate: 0 },
+      headers: {
+        'Accept': 'application/json',
+        'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return [];
+      throw new Error('Failed to fetch messages');
+    }
+
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data;
+    }
+    
+    if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      return data.data;
+    }
+
+    return [];
+  } catch (error) {
+    console.error(`Error fetching messages for collaborator ${collaboratorId}:`, error);
+    return [];
+  }
+}
+
+export async function getMessage(id: number): Promise<Message | null> {
+  try {
+    const response = await fetch(`${API_URL}message/${id}`, {
+      next: { revalidate: 0 },
+      headers: {
+        'Accept': 'application/json',
+        'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+      },
+    });
+
+    if (!response.ok) {
+       return null;
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  } catch (error) {
+    console.error(`Error fetching message ${id}:`, error);
+    return null;
+  }
+}
+
+export async function markMessageAsRead(id: number) {
+  const formData = new FormData();
+  formData.append('_method', 'PUT');
+
+  const response = await fetch(`${API_URL}message/${id}/read`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to mark message as read');
+  }
+
+  return response.json();
+}
