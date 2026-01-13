@@ -37,7 +37,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
         {newsItem.image && (
           <div className="w-full rounded-xl overflow-hidden mb-8 shadow-sm">
             <img
-              src={`${storageUrl}${newsItem.image}`}
+              src={newsItem.image}
               alt={newsItem.title}
               className="w-full h-auto max-h-[500px] object-cover"
             />

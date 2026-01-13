@@ -101,21 +101,37 @@ export async function getNews(): Promise<NewsItem[]> {
 
     const data = await response.json();
     
+    let items: NewsItem[] = [];
     if (Array.isArray(data)) {
-      return data;
+      items = data;
+    } else if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      items = data.data;
     }
     
-    if (data && typeof data === 'object' && Array.isArray(data.data)) {
-      return data.data;
-    }
-
-    return [];
+    return items.map(transformNewsItem);
   } catch (error) {
     console.error('Error fetching news:', error);
     return [];
   }
 }
+function transformNewsItem(item: NewsItem): NewsItem {
+  let image = item.image;
 
+  // Se não tem image, usa a primeira foto
+  if (!image && Array.isArray(item.photos) && item.photos.length > 0) {
+    image = item.photos[0];
+  }
+
+  // Se tem imagem e não é externa (https), adiciona storageUrl
+  if (image && !image.startsWith('http://') && !image.startsWith('https://')) {
+    image = `${storageUrl}${image}`;
+  }
+
+  return {
+    ...item,
+    image
+  };
+}
 export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
   try {
     // Primeiro tenta buscar todas as notícias e filtrar (fallback caso o endpoint de slug não exista)
@@ -137,7 +153,8 @@ export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
     }
 
     const data = await response.json();
-    return data.data || data;
+    const rawItem = data.data || data;
+    return rawItem ? transformNewsItem(rawItem) : null;
   } catch (error) {
     console.error(`Error fetching news with slug ${slug}:`, error);
     return null;

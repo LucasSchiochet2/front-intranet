@@ -19,7 +19,7 @@ export async function News() {
             {news[0].image && (
               <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-100 mb-3">
                 <img 
-                  src={`${storageUrl}${news[0].image}`} 
+                  src={news[0].image} 
                   alt={news[0].title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -46,7 +46,7 @@ export async function News() {
               {item.image && (
                 <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
                   <img 
-                    src={`${storageUrl}${item.image}`} 
+                    src={item.image} 
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

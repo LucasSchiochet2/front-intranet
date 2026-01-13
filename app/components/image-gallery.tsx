@@ -54,7 +54,7 @@ export function ImageGallery({ photos, storageUrl, title }: ImageGalleryProps) {
             onClick={() => openGallery(index)}
           >
             <img
-              src={`${storageUrl}${photo}`}
+              src={`${photo}`}
               alt={`Foto ${index + 1} - ${title}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
@@ -93,7 +93,7 @@ export function ImageGallery({ photos, storageUrl, title }: ImageGalleryProps) {
                 <SwiperSlide key={index} className="flex items-center justify-center h-full">
                   <div className="relative w-full h-full flex items-center justify-center">
                     <img
-                      src={`${storageUrl}${photo}`}
+                      src={`${photo}`}
                       alt={`Foto ${index + 1} - ${title}`}
                       className="max-w-full max-h-full object-contain"
                     />

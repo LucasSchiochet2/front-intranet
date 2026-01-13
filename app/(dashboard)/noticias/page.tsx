@@ -18,7 +18,7 @@ export default async function NoticiasPage() {
               <div className="relative h-48 w-full bg-gray-100">
                 {item.image ? (
                   <img
-                    src={`${storageUrl}${item.image}`}
+                    src={item.image}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
