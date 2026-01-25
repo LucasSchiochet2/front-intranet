@@ -53,7 +53,7 @@ export function NewDashboardDialog({ collaborators = [] }: NewDashboardDialogPro
     return (
       <button 
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg transition-colors font-medium shadow-sm"
+        className="flex items-center md:h-[65px] gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg transition-colors font-medium shadow-sm"
       >
         <LayoutDashboard className="w-5 h-5" />
         Novo Dashboard

@@ -61,9 +61,11 @@ export default async function TarefasPage(props: { searchParams: SearchParams })
            {!showArchived && (
             <>
               <NewDashboardDialog collaborators={collaborators} />
-              <NewTaskDialog userEmail={user?.email} collaborators={collaborators} dashboards={dashboards} />
             </>
            )}
+        </div>
+        <div className="flex items-center w-full">
+           <NewTaskDialog userEmail={user?.email} collaborators={collaborators} dashboards={dashboards} />
         </div>
       </div>
 

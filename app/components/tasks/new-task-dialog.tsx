@@ -43,7 +43,7 @@ export function NewTaskDialog({ userEmail, collaborators = [], dashboards = [] }
     return (
       <button 
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors font-medium shadow-sm"
+        className="flex max-sm:w-full items-center gap-2 md:h-[65px] bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg transition-colors font-medium shadow-sm"
       >
         <Plus className="w-5 h-5" />
         Nova Tarefa

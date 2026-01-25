@@ -155,7 +155,7 @@ export function KanbanBoard({ initialTasks, isArchivedView = false, collaborator
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-6 h-full overflow-x-auto pb-4">
+      <div className="flex flex-col xl:flex-row gap-6 max-h-[calc(100vh-12rem)] overflow-auto pb-4">
       {COLUMNS.map((col) => {
         const tasks = getTasksForColumn(col.id);
         

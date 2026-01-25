@@ -22,6 +22,7 @@ interface HeaderProps {
 
 export function Header({ onToggleSidebar, user }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -56,6 +57,15 @@ export function Header({ onToggleSidebar, user }: HeaderProps) {
     router.push('/login');
   };
 
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (q) {
+      router.push(`/search?q=${encodeURIComponent(q)}`);
+      setIsSearchOpen(false);
+    }
+  };
+
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -64,6 +74,10 @@ export function Header({ onToggleSidebar, user }: HeaderProps) {
       .join('')
       .toUpperCase();
   };
+
+  const photoSrc = user?.url_photo
+    ? `${(process.env.NEXT_PUBLIC_BASE_URL || '').replace(/\/$/, '')}/${user.url_photo.replace(/^\/+/, '')}`
+    : undefined;
 
   return (
     <header className="h-24 bg-white border-b border-gray-200 flex items-center justify-between px-6 fixed top-0 w-full z-50">
@@ -84,34 +98,40 @@ export function Header({ onToggleSidebar, user }: HeaderProps) {
       </div>
 
       {/* Search Bar - Desktop (Visible on md and up) */}
-      <div className="hidden md:block flex-1 max-w-xl mx-8">
+      <form onSubmit={handleSearchSubmit} className="hidden md:block flex-1 max-w-xl mx-8">
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <i className="las la-search text-gray-400 text-xl"></i>
           </div>
           <input
+            name="q"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             type="text"
             className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white transition-colors"
             placeholder="Buscar na intranet..."
           />
         </div>
-      </div>
+      </form>
 
       {/* Search Bar - Mobile (Visible only when toggled) */}
       {isSearchOpen && (
-        <div className="flex-1 mx-4 md:hidden animate-in fade-in zoom-in duration-200">
+        <form onSubmit={handleSearchSubmit} className="flex-1 mx-4 md:hidden animate-in fade-in zoom-in duration-200">
            <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <i className="las la-search text-gray-400 text-xl"></i>
             </div>
             <input
+                name="q"
                 type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
                 className="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:bg-white transition-colors"
                 placeholder="Buscar..."
             />
            </div>
-        </div>
+        </form>
       )}
 
       {/* Right Actions */}
@@ -187,7 +207,7 @@ export function Header({ onToggleSidebar, user }: HeaderProps) {
                 className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
               >
                 <img
-                  src={process.env.NEXT_PUBLIC_BASE_URL + user.url_photo}
+                  src={photoSrc}
                   alt={user.name || 'User Photo'}
                   className="w-12 h-12 rounded-full object-cover"
                 />
