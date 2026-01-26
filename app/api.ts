@@ -1097,6 +1097,31 @@ export type GeneralSearchResponse = {
   results: GeneralSearchResult[];
 };
 
+export async function getCollaboratorDocuments(collaboratorId: number): Promise<Document[]> {
+  try {
+    const response = await fetch(`${API_URL}documents/collaborator/${collaboratorId}`, {
+      next: { revalidate: 60 },
+      headers: {
+        'Accept': 'application/json',
+        'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+      },
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) return [];
+      throw new Error('Failed to fetch collaborator documents');
+    }
+
+    const data = await response.json();
+    if (Array.isArray(data)) return data;
+    if (data.data && Array.isArray(data.data)) return data.data;
+    return [];
+  } catch (error) {
+    console.error(`Error fetching documents for collaborator ${collaboratorId}:`, error);
+    return [];
+  }
+}
+
 export async function searchIntranet(query: string): Promise<GeneralSearchResponse> {
   let data: GeneralSearchResponse = { query, total: 0, results: [] };
   try {

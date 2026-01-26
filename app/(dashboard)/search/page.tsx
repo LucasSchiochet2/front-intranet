@@ -19,12 +19,6 @@ type NewsItem = {
   published_at?: string | null;
 };
 
-type Collaborator = {
-  id: number;
-  name?: string | null;
-  email?: string | null;
-};
-
 type CalendarItem = {
   id: number;
   title?: string | null;
@@ -52,12 +46,6 @@ type SearchResult =
   | ({ type: 'page' } & PageItem)
   | ({ type: 'banner' } & BannerItem)
   | ({ type: 'collaborator' } & { id: number; title?: string | null; preview?: string | null; name?: string | null; email?: string | null });
-
-type SearchResponse = {
-  query: string;
-  total: number;
-  results: SearchResult[];
-};
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const resolved = await searchParams;
