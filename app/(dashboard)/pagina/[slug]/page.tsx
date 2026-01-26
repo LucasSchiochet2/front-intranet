@@ -1,24 +1,46 @@
 import { notFound } from 'next/navigation';
 import { getPageBySlug } from '@/app/api';
+import { Metadata } from 'next';
 import React from 'react';
 
 interface PageProps {
-  params: Promise<{ slug: string }> | { slug: string };
+  params: Promise<{ slug: string }>;
+}
+
+// 1. Geração Dinâmica de Metadados (SEO)
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const page = await getPageBySlug(slug);
+
+  if (!page) return { title: 'Página não encontrada' };
+
+  return {
+    title: page.title,
+    description: page.extras || '',
+  };
 }
 
 export default async function PaginaInterna({ params }: PageProps) {
-  const resolvedParams = await params;
-  const page = await getPageBySlug(resolvedParams.slug);
+  const { slug } = await params;
+  const page = await getPageBySlug(slug);
 
-  if (!page) return notFound();
+  if (!page) {
+    notFound();
+  }
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-4">{page.title}</h1>
-      <article
-        className="prose prose-lg"
-        dangerouslySetInnerHTML={{ __html: page.content ?? '' }}
-      />
-    </div>
+    <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <header className="mb-8 border-b pb-8">
+        <p className="text-primary font-extrabold text-4xl!" style={{ fontSize: '36px' }}>
+          {page.title}
+        </p>
+      </header>
+      
+      <article className="prose prose-slate prose-lg max-w-none">
+        <section 
+          dangerouslySetInnerHTML={{ __html: page.content ?? '' }} 
+        />
+      </article>
+    </main>
   );
 }
