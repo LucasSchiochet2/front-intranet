@@ -1050,3 +1050,36 @@ export async function markMessageAsRead(id: number) {
 
   return response.json();
 }
+type PageItem = {
+  id: number;
+  title?: string | null;
+  slug?: string | null;
+  preview?: string | null;
+};
+// General search for intranet (news, documents, calendar, etc)
+export type GeneralSearchResult =
+  | ({ type: 'news' } & NewsItem)
+  | ({ type: 'document' } & Document)
+  | ({ type: 'calendar' } & CalendarEvent)
+  | ({ type: 'page' } & PageItem)
+  | ({ type: 'banner' } & Banner)
+  | ({ type: 'collaborator' } & Collaborator);
+
+export type GeneralSearchResponse = {
+  query: string;
+  total: number;
+  results: GeneralSearchResult[];
+};
+
+export async function searchIntranet(query: string): Promise<GeneralSearchResponse> {
+  let data: GeneralSearchResponse = { query, total: 0, results: [] };
+  try {
+    const res = await fetch(`${API_URL}search?q=${encodeURIComponent(query)}`, { cache: 'no-store' });
+    if (res.ok) {
+      data = await res.json();
+    }
+  } catch (err) {
+    console.error('Failed to fetch search API:', err);
+  }
+  return data;
+}

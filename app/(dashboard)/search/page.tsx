@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { searchIntranet } from '../../api';
 
 type Document = {
   id: string | number;
@@ -71,17 +72,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     );
   }
 
-  // Fetch aggregated results from internal API route which proxies the central search
-  const apiUrl = `https://intranetproject-production.up.railway.app/api/search?q=${encodeURIComponent(q)}`;
-  let data: SearchResponse = { query: q, total: 0, results: [] };
-  try {
-    const res = await fetch(apiUrl, { cache: 'no-store' });
-    if (res.ok) {
-      data = await res.json();
-    }
-  } catch (err) {
-    console.error('Failed to fetch search API:', err);
-  }
+  // Use shared API function for search
+  const data = await searchIntranet(q);
   const results: SearchResult[] = data.results || [];
 
   const news = results.filter((r): r is Extract<SearchResult, { type: 'news' }> => r.type === 'news');
