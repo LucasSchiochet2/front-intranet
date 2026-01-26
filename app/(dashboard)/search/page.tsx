@@ -72,12 +72,13 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   }
 
   // Fetch aggregated results from internal API route which proxies the central search
-  const base = (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
-  const apiUrl = `${base}/api/search?q=${encodeURIComponent(q)}`;
+  const apiUrl = `https://intranetproject-production.up.railway.app/api/search?q=${encodeURIComponent(q)}`;
   let data: SearchResponse = { query: q, total: 0, results: [] };
   try {
     const res = await fetch(apiUrl, { cache: 'no-store' });
-    data = (await res.json()) as SearchResponse;
+    if (res.ok) {
+      data = await res.json();
+    }
   } catch (err) {
     console.error('Failed to fetch search API:', err);
   }
