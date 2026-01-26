@@ -62,7 +62,7 @@ export async function getMenu(): Promise<MenuItem[]> {
     }
 
     const data = await response.json();
-    
+
     // Handle if the API returns an object with numeric keys instead of an array
     if (typeof data === 'object' && !Array.isArray(data)) {
       return Object.values(data);
@@ -964,7 +964,27 @@ export async function getFastAccess(): Promise<MenuItem[]> {
     return [];
   }
 }
+export async function getPageBySlug(slug: string): Promise<PageItem | null> {
+  try {
+    const response = await fetch(`${API_URL}pages/${slug}`, {
+      next: { revalidate: 0 },
+      headers: {
+        'Accept': 'application/json',
+        'X-Frontend-Secret': process.env.FRONTEND_SECRET || '',
+      },
+    });
 
+    if (!response.ok) {
+       return null;
+    }
+
+    const data = await response.json();
+    return data.data || data;
+  } catch (error) {
+    console.error(`Error fetching page ${slug}:`, error);
+    return null;
+  }
+}
 export interface Message {
   id: number;
   title: string;
@@ -1050,11 +1070,17 @@ export async function markMessageAsRead(id: number) {
 
   return response.json();
 }
-type PageItem = {
+export type PageItem = {
   id: number;
   title?: string | null;
   slug?: string | null;
-  preview?: string | null;
+  content?: string | null;
+  template?: string | null;
+  extras?: string | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  tenant_id: string | null;
 };
 // General search for intranet (news, documents, calendar, etc)
 export type GeneralSearchResult =
