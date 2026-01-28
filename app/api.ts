@@ -1,7 +1,7 @@
 export const API_URL = process.env.API_URL?.endsWith('/') 
   ? process.env.API_URL 
   : `${process.env.API_URL}/`;
-export const storageUrl = 'https://pub-6a3bf9787e92468db0d423b6545a5fa8.r2.dev/ls-intranet/';
+export const storageUrl = 'https://pub-6a3bf9787e92468db0d423b6545a5fa8.r2.dev/';
 
 export interface MenuItem {
   id: number;
