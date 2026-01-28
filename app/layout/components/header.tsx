@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { logout, getCollaboratorMessagesAction, markMessageAsReadAction } from '@/app/actions';
 import { useRouter } from 'next/navigation';
-import { Message } from '@/app/api';
+import { Message } from '@/app/interfaces';
 
 interface User {
   id: number;

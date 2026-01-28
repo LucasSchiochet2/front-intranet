@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useOptimistic, startTransition } from 'react';
-import { Task, Collaborator, Dashboard } from '../../api';
+import { Task, Collaborator, Dashboard } from '../../interfaces';
 import { TaskCard } from './task-card';
 import { EditTaskDialog } from './edit-task-dialog';
 import { TaskDetailsDialog } from './task-details-dialog';
@@ -115,44 +115,81 @@ export function KanbanBoard({ initialTasks, isArchivedView = false, collaborator
   return (
     <div className="flex flex-col h-full gap-4">
       {dashboards.length > 0 && (
-        <div className="flex items-center gap-2 pb-2 border-b border-gray-200">
-           <button
-                onClick={() => setSelectedDashboard('all')}
-                className={`px-6 py-3 text-base font-medium rounded-t-lg transition-colors whitespace-nowrap ${
-                    selectedDashboard === 'all'
-                        ? 'bg-white border-b-2 border-primary text-primary'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                }`}
-            >
-                Minhas Tarefas
-            </button>
-            {dashboards.map(d => (
-                <div key={d.id} className="relative group">
-                    <button
-                        onClick={() => setSelectedDashboard(d.id.toString())}
-                        className={`px-6 py-3 text-base font-medium rounded-t-lg transition-colors whitespace-nowrap pr-10 ${
-                            selectedDashboard === d.id.toString()
-                                ? 'bg-white border-b-2 border-primary text-primary'
-                                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                        }`}
-                    >
-                        {d.name}
-                    </button>
-                    {selectedDashboard === d.id.toString() && (
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingDashboard(d);
-                            }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary hover:bg-gray-100 rounded-full transition-colors"
-                            title="Configurações do Dashboard"
-                        >
-                            <Settings className="w-4 h-4" />
-                        </button>
-                    )}
-                </div>
-            ))}
+          <><div className="hidden md:flex items-center gap-2 pb-2 border-b border-gray-200">
+          <button
+            onClick={() => setSelectedDashboard('all')}
+            className={`px-6 py-3 text-base font-medium rounded-t-lg transition-colors whitespace-nowrap ${selectedDashboard === 'all'
+                ? 'bg-white border-b-2 border-primary text-primary'
+                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+          >
+            Minhas Tarefas
+          </button>
+          {dashboards.map(d => (
+            <div key={d.id} className="relative group">
+              <button
+                onClick={() => setSelectedDashboard(d.id.toString())}
+                className={`px-6 py-3 text-base font-medium rounded-t-lg transition-colors whitespace-nowrap pr-10 ${selectedDashboard === d.id.toString()
+                    ? 'bg-white border-b-2 border-primary text-primary'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`}
+              >
+                {d.name}
+              </button>
+              {selectedDashboard === d.id.toString() && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEditingDashboard(d);
+                  } }
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-primary hover:bg-gray-100 rounded-full transition-colors"
+                  title="Configurações do Dashboard"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          ))}
         </div>
+        <div className="flex md:hidden flex-col sm:flex-row sm:items-center gap-2 pb-2 sm:border-b border-gray-200">
+
+            <button
+              onClick={() => setSelectedDashboard('all')}
+              className={`px-6 py-3 text-base font-medium transition-all whitespace-nowrap
+          rounded-lg sm:rounded-t-lg sm:rounded-b-none border sm:border-0
+          ${selectedDashboard === 'all'
+                  ? 'bg-white border-primary sm:border-b-2 text-primary'
+                  : 'text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-50'}`}
+            >
+              Minhas Tarefas
+            </button>
+
+            {dashboards.map((d) => (
+              <div key={d.id} className="relative group w-full sm:w-auto">
+                <button
+                  onClick={() => setSelectedDashboard(d.id.toString())}
+                  className={`w-full sm:w-auto px-6 py-3 text-center sm:text-center text-base font-medium transition-all whitespace-nowrap pr-12
+              rounded-lg sm:rounded-t-lg sm:rounded-b-none border sm:border-0
+              ${selectedDashboard === d.id.toString()
+                      ? 'bg-white border-primary sm:border-b-2 text-primary'
+                      : 'text-gray-500 border-transparent hover:text-gray-700 hover:bg-gray-50'}`}
+                >
+                  {d.name}
+                </button>
+
+                {selectedDashboard === d.id.toString() && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingDashboard(d);
+                    } }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-primary hover:bg-gray-100 rounded-full transition-colors"
+                    title="Configurações do Dashboard"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div></>
       )}
 
       <div className="flex flex-col xl:flex-row gap-6 max-h-[calc(100vh-12rem)] overflow-auto pb-4">

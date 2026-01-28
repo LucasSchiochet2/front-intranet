@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { editTaskAction, editTaskJsonAction } from '../../actions';
 import { Loader2, Save, X, Paperclip, CheckSquare, Plus, Trash2 } from 'lucide-react';
-import { Task, Collaborator, ChecklistItem, Dashboard } from '../../api';
+import { Task, Collaborator, ChecklistItem, Dashboard } from '../../interfaces';
 
 interface EditTaskDialogProps {
   task: Task | null;

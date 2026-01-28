@@ -1,37 +1,9 @@
+import {Document,DocumentCategory,DocumentsResponse,Collaborator,Dashboard,Task,OmbudsmanData,CalendarEvent,NewsItem,MenuItem,Banner,Message} from './interfaces';
+
 export const API_URL = process.env.API_URL?.endsWith('/') 
   ? process.env.API_URL 
   : `${process.env.API_URL}/`;
 export const storageUrl = 'https://pub-6a3bf9787e92468db0d423b6545a5fa8.r2.dev/';
-
-export interface MenuItem {
-  id: number;
-  name: string;
-  type: string;
-  link: string | null;
-  page_id: number | null;
-  parent_id: number | null;
-  lft: number;
-  rgt: number;
-  depth: number;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
-  tenant_id: string | null;
-  icon: string | null;
-  children: MenuItem[];
-}
-
-export interface Banner {
-  id: number;
-  title: string;
-  description: string | null;
-  image_url: string | null;
-  link_url: string | null;
-  is_active: number;
-  display_order: number;
-  created_at: string;
-  updated_at: string;
-}
 
 export async function getBanners(): Promise<Banner[]> {
   try {
@@ -75,19 +47,7 @@ export async function getMenu(): Promise<MenuItem[]> {
   }
 }
 
-export interface NewsItem {
-  id: number;
-  title: string;
-  slug: string;
-  content: string;
-  image: string;
-  featured: boolean;
-  published_at: string;
-  created_at: string;
-  updated_at: string;
-  photos: string[];
-  tenant_id: number | null;
-}
+
 
 export async function getNews(): Promise<NewsItem[]> {
   try {
@@ -161,17 +121,7 @@ export async function getNewsBySlug(slug: string): Promise<NewsItem | null> {
   }
 }
 
-export interface CalendarEvent {
-  id: number;
-  title: string;
-  description: string | null;
-  start_date: string;
-  end_date: string;
-  collaborator?: {
-    id: number;
-    name: string;
-  };
-}
+
 
 export async function getCalendarEvents(): Promise<CalendarEvent[]> {
   try {
@@ -245,20 +195,7 @@ export async function login(credentials: {email: string, password: string}) {
 }
 
 
-export interface OmbudsmanData {
-  id: number;
-  status: 'open' | 'in_progress' | 'resolved' | string;
-  created_at: string;
-  message?: string;
-  description?: string;
-  response?: string;
-  admin_notes?: string;
-  subject?: string;
-  type?: string;
-  attachment?: string;
-  admin_attachment?: string;
-  resolved_at?: string;
-}
+
 
 export async function getOmbudsmanProtocol(token: string): Promise<OmbudsmanData> {
   const response = await fetch(`${API_URL}ombudsman/${token}`, {
@@ -270,11 +207,7 @@ export async function getOmbudsmanProtocol(token: string): Promise<OmbudsmanData
 
   return response.json();
 }
-export interface BirthDay {
-  name: string;
-  birth_date: string;
-  url_photo?: string | null;
-}
+
 export async function getBirthDays() {
   try {
     const response = await fetch(`${API_URL}birthdays`, {
@@ -295,39 +228,6 @@ export async function getBirthDays() {
   }
 }
 
-export interface DocumentCategory {
-  id: number;
-  name: string;
-  slug: string;
-  created_at: string;
-  updated_at: string;
-  tenant_id: string | null;
-}
-
-export interface DocumentFile {
-  id: number;
-  url: string;
-  name: string;
-}
-
-export interface Document {
-  id: number;
-  document_category_id: number;
-  title: string;
-  description: string;
-  files: string[];
-  created_at: string;
-  updated_at: string;
-  tenant_id: string | null;
-  category: DocumentCategory;
-}
-
-export interface DocumentsResponse {
-  current_page: number;
-  data: Document[];
-  last_page?: number;
-  total?: number;
-}
 
 export async function getDocuments(page = 1, categoryId?: number): Promise<DocumentsResponse> {
   try {
@@ -415,54 +315,6 @@ export async function getShowDocuments(id: number): Promise<Document | null> {
   }
 }
 
-export interface Collaborator {
-  id: number;
-  name: string;
-  email: string;
-  tenant_id?: number | string;
-}
-
-export interface ChecklistItem {
-  id?: number;
-  description: string;
-  is_completed: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
-
-export interface Dashboard {
-  id: number;
-  name: string;
-  description?: string;
-  created_at: string;
-  updated_at: string;
-  collaborators?: Collaborator[];
-  tasks?: Task[];
-}
-
-export interface Task {
-  id: number;
-  title: string;
-  description: string;
-  dashboard_id?: number | null;
-  is_completed: boolean;
-  deadline?: string;
-  collaborator_id_sender: number;
-  collaborator_id_receiver: number;
-  status: string; // 'pending' | 'in_progress' | 'done'
-  tag?: string;
-  attachment?: string[] | string | null;
-  checklist_items?: ChecklistItem[];
-  created_at: string;
-  updated_at: string;
-  sender?: Collaborator;
-  receiver?: Collaborator;
-  is_archived?: boolean | number;
-  // Old fields for backward compatibility/during transition
-  message?: string;
-  subject?: string;
-  type?: string;
-}
 
 export async function getCollaborators(): Promise<Collaborator[]> {
   try {
@@ -984,16 +836,6 @@ export async function getPageBySlug(slug: string): Promise<PageItem | null> {
     console.error(`Error fetching page ${slug}:`, error);
     return null;
   }
-}
-export interface Message {
-  id: number;
-  title: string;
-  content: string;
-  sender: string;
-  is_read: number;
-  attachment?: string | null;
-  created_at?: string;
-  updated_at?: string;
 }
 
 export async function getCollaboratorMessages(collaboratorId: number): Promise<Message[]> {

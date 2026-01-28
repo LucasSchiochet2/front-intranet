@@ -1,7 +1,6 @@
-import React from 'react';
-import { getDocuments, getDocumentCategories, searchDocuments, storageUrl } from '../../api';
+import { getDocuments, getDocumentCategories, searchDocuments } from '../../api';
 import Link from 'next/link';
-import { FileText, Download, Calendar } from 'lucide-react';
+import { FileText, Calendar } from 'lucide-react';
 import { DocumentsFilter } from './documents-filter';
 
 export default async function DocumentsPage({
@@ -24,7 +23,6 @@ export default async function DocumentsPage({
   }
 
   const { data: documents = [], current_page, last_page } = documentsData;
-
   // Helper to build pagination URL preserving other params
   const getPaginationUrl = (newPage: number) => {
     const params = new URLSearchParams();

@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
-import { DocumentCategory } from '@/app/api';
+import { DocumentCategory } from '@/app/interfaces';
 
 export function DocumentsFilter({ categories }: { categories: DocumentCategory[] }) {
   const router = useRouter();

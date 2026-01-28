@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { MenuItem } from '../../api';
+import { MenuItem } from '../../interfaces';
 
 const MenuItemComponent = ({ item }: { item: MenuItem }) => {
   const hasChildren = item.children && item.children.length > 0;

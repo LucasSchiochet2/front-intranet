@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import { OmbudsmanData, storageUrl } from "../../../api";
+import { storageUrl } from "../../../api";
+import { OmbudsmanData } from "@/app/interfaces";
 import { fetchOmbudsmanProtocol } from "@/app/actions";
 
 const statusMap: Record<string, string> = {

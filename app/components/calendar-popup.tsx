@@ -1,7 +1,7 @@
 'use client';
 
 import { X, Clock, Calendar as CalendarIcon, User } from 'lucide-react';
-import { CalendarEvent } from '../api';
+import { CalendarEvent } from '../interfaces';
 import { useEffect, useRef } from 'react';
 
 interface CalendarPopupProps {

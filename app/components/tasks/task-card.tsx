@@ -1,4 +1,4 @@
-import { Task } from '../../api';
+import { Task } from '../../interfaces';
 import { Calendar, Paperclip, Clock, Archive, Undo2 } from 'lucide-react';
 import { archiveTaskAction, unarchiveTaskAction } from '../../actions';
 

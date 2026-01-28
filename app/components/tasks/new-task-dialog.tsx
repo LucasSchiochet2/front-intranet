@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { submitTask } from '../../actions'; // Ensure this path is correct
 import { Loader2, Plus, X, Upload } from 'lucide-react';
-import { Collaborator, Dashboard } from '../../api';
+import { Collaborator, Dashboard } from '../../interfaces';
 
 interface NewTaskDialogProps {
   userEmail?: string;

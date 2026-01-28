@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CalendarEvent } from '../api';
+import { CalendarEvent } from '../interfaces';
 import { CalendarPopup } from './calendar-popup';
 
 interface CalendarListProps {

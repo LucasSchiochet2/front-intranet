@@ -7,7 +7,8 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Banner, storageUrl } from '../api';
+import {  storageUrl } from '../api';
+import { Banner } from '../interfaces';
 
 export function BannersCarousel({ banners }: { banners: Banner[] }) {
   if (!banners || banners.length === 0) return null;

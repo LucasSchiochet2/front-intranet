@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { createDashboardAction } from '../../actions'; 
 import { Loader2, X, Users, LayoutDashboard } from 'lucide-react';
-import { Collaborator } from '../../api';
+import { Collaborator } from '../../interfaces';
 
 interface NewDashboardDialogProps {
   collaborators?: Collaborator[];

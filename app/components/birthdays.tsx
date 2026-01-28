@@ -1,5 +1,6 @@
 import React from 'react';
-import { getBirthDays, BirthDay, storageUrl } from '../api';
+import { getBirthDays,  storageUrl } from '../api';
+import { BirthDay } from '../interfaces';
 import Image from 'next/image';
 
 function getInitials(name: string) {

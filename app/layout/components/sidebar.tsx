@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { getMenu, MenuItem } from '../../api';
+import { getMenu } from '../../api';
+import { MenuItem } from '../../interfaces';
 
 const MenuItemComponent = ({ item }: { item: MenuItem }) => {
   const hasChildren = item.children && item.children.length > 0;

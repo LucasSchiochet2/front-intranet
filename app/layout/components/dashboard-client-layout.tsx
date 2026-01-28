@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Header } from './header';
 import { SidebarClient } from './sidebar-client';
 import { Breadcrumb } from './breadcrumb';
-import { MenuItem } from '../../api';
+import { MenuItem } from '../../interfaces';
 
 interface User {
   id: number;

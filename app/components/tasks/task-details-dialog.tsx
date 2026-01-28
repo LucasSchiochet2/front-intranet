@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Task, Collaborator, storageUrl } from '../../api';
+import {  storageUrl } from '../../api';
+import { Task, Collaborator } from '../../interfaces';
 import { getTaskDetailsAction } from '../../actions';
 import { Calendar, Clock, Edit2, FileText, X, User, Tag, Paperclip, Download, CheckSquare, CheckCircle2, Circle, Loader2 } from 'lucide-react';
 

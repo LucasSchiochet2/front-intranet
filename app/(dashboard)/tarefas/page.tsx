@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import { getCollaboratorTasks, getCollaborators, getArchivedTasks, getCollaboratorDashboards, getPersonalDashboards, getDashboard, Task } from '../../api';
+import { getCollaboratorTasks, getCollaborators, getArchivedTasks, getCollaboratorDashboards, getPersonalDashboards, getDashboard } from '../../api';
+import { Task } from '../../interfaces';
 import { KanbanBoard } from '../../components/tasks/kanban-board';
 import { NewTaskDialog } from '../../components/tasks/new-task-dialog';
 import { NewDashboardDialog } from '../../components/tasks/new-dashboard-dialog';

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { updateDashboardAction, deleteDashboardAction } from '../../actions'; 
 import { Loader2, X, Users, Save, Trash2 } from 'lucide-react';
-import { Collaborator, Dashboard } from '../../api';
+import { Collaborator, Dashboard } from '../../interfaces';
 
 interface EditDashboardDialogProps {
   dashboard: Dashboard & { collaborators?: Collaborator[] | {id: number}[] }; // Flexible to handle what backend sends
