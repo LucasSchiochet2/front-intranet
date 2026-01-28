@@ -1,8 +1,10 @@
 'use server'
 
-import { login, API_URL, getOmbudsmanProtocol, createTask, updateTask, Task, archiveTask, createDashboard, updateDashboard, deleteDashboard, getCollaborators, getMenu, getCollaboratorDashboards, getDashboard, getTask, getCollaboratorMessages, markMessageAsRead } from './api';
+import { login, API_URL, getOmbudsmanProtocol, createTask, updateTask, archiveTask, createDashboard, updateDashboard, deleteDashboard, getCollaborators, getMenu, getCollaboratorDashboards, getDashboard, getTask, getCollaboratorMessages, markMessageAsRead } from './api';
+import { Task } from './interfaces';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { RSC_DYNAMIC_IMPORT_WRAPPER_ALIAS } from 'next/dist/lib/constants';
 
 export async function getTaskDetailsAction(id: number) {
     try {
