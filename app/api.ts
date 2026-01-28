@@ -316,9 +316,9 @@ export async function getShowDocuments(id: number): Promise<Document | null> {
 }
 
 
-export async function getCollaborators(): Promise<Collaborator[]> {
+export async function getCollaborators(page = 1): Promise<Collaborator[]> {
   try {
-    const response = await fetch(`${API_URL}collaborators`, {
+    const response = await fetch(`${API_URL}collaborators?page=${page}`, {
       next: { revalidate: 60 },
       headers: {
         'Accept': 'application/json',
